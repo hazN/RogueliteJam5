@@ -1,0 +1,2 @@
+Models: Synty 
+Sounds: https://opengameart.org/content/rpg-sound-pack
