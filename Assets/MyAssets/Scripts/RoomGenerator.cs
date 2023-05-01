@@ -1,12 +1,14 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Unity.AI.Navigation;
+using Unity.VisualScripting;
 
 public class RoomGenerator : MonoBehaviour
 {
     // Prefabs
     public GameObject[] floorPrefabs;
+
     public GameObject[] wallPrefabs;
     public GameObject doorPrefab;
     public GameObject holePrefab;
@@ -14,29 +16,39 @@ public class RoomGenerator : MonoBehaviour
 
     // Room generation settings
     public int roomWidth;
+
     public int roomHeight;
     public float holeProbability = 0.1f;
 
-    void Start()
+    // Navmesh
+    [SerializeField] private NavMeshSurface surface;
+    [SerializeField] private GameObject player;
+    private void Start()
     {
+        player = GameObject.FindGameObjectWithTag("Player");
         GenerateInitialRoom();
     }
-
-    void GenerateInitialRoom()
+    private void Update()
+    {
+       
+    }
+    private void GenerateInitialRoom()
     {
         GenerateRoom(Vector3.zero);
     }
 
     public void GenerateRoom(Vector3 position)
     {
+        player.gameObject.SetActive(false);
         InstantiateFloorTiles(position);
         InstantiateWalls(position);
+        surface.BuildNavMesh();
+        player.gameObject.SetActive(true);
     }
 
-    void InstantiateFloorTiles(Vector3 position)
+    private void InstantiateFloorTiles(Vector3 position)
     {
         List<Vector2Int> holePositions = new List<Vector2Int>();
-
         // Generate hole positions
         for (int i = 0; i < roomWidth * roomHeight * holeProbability; i++)
         {
@@ -93,7 +105,7 @@ public class RoomGenerator : MonoBehaviour
         }
     }
 
-    void InstantiateWalls(Vector3 position)
+    private void InstantiateWalls(Vector3 position)
     {
         int wallHeight = 2;
         int exitDoorCount = (Random.value < 0.6f) ? 2 : (Random.value < 0.85f) ? 3 : 4;
@@ -160,12 +172,13 @@ public class RoomGenerator : MonoBehaviour
                     }
 
                     GameObject wall = Instantiate(prefabToInstantiate, wallPosition, prefabRotation);
+
                 }
             }
         }
     }
 
-    int GetWallNumber(int x, int y, int roomWidth, int roomHeight)
+    private int GetWallNumber(int x, int y, int roomWidth, int roomHeight)
     {
         if (x == -1 && y == roomHeight / 2) return 1;
         if (x == roomWidth && y == roomHeight / 2) return 2;
@@ -174,5 +187,4 @@ public class RoomGenerator : MonoBehaviour
 
         return 0;
     }
-
 }

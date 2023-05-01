@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Weapon : MonoBehaviour
@@ -18,6 +19,7 @@ public class Weapon : MonoBehaviour
         {
             // Deal Damage      
             float finalDamage = Random.Range(damage.x, damage.y);
+            other.GetComponent<Health>().TakeDamage(finalDamage);
         }
     }
     public void EnableHitbox()
