@@ -8,12 +8,16 @@ public class PlayerCombat : MonoBehaviour
     float lastClickTime;
     float lastComboEnd;
     int comboIndex;
+    Weapon weaponScript = null;
 
     Animator anim;
     [SerializeField] Weapon weapon;
     void Start()
     {
         anim = GetComponent<Animator>();
+
+        // Get weapon script reference
+        weaponScript = GetComponentInChildren<Weapon>();
     }
 
     void Update()
@@ -65,5 +69,12 @@ public class PlayerCombat : MonoBehaviour
             AudioSource.PlayClipAtPoint(weapon.audioClips[comboIndex], transform.position);
         }
     }
-
+    private void OnAttackStart()
+    {
+        weaponScript.EnableHitbox();
+    }
+    private void OnAttackEnd()
+    {
+        weaponScript.DisableHitbox();
+    }
 }

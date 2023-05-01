@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Weapon : MonoBehaviour
@@ -7,17 +8,33 @@ public class Weapon : MonoBehaviour
     public Vector2 damage;
     BoxCollider hitbox;
     public List<AudioClip> audioClips;
-
+    private bool isPlayer = false;
     void Start()
     {
         hitbox = GetComponent<BoxCollider>();
+        // Check if this is apart of the player gameobject
+        if (transform.root.name == "Player")
+            isPlayer = true;
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Enemy"))
+        if (isPlayer)
         {
-            // Deal Damage      
-            float finalDamage = Random.Range(damage.x, damage.y);
+            if (other.CompareTag("Enemy"))
+            {
+                // Deal Damage      
+                float finalDamage = Random.Range(damage.x, damage.y);
+                other.GetComponent<Health>().TakeDamage(finalDamage);
+            }
+        }
+        else
+        {
+            if (other.CompareTag("Player"))
+            {
+                // Deal Damage      
+                float finalDamage = Random.Range(damage.x, damage.y);
+                other.GetComponent<Health>().TakeDamage(finalDamage);
+            }
         }
     }
     public void EnableHitbox()
