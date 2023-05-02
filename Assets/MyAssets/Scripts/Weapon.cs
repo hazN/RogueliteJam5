@@ -7,7 +7,9 @@ public class Weapon : MonoBehaviour
     public Vector2 damage;
     BoxCollider hitbox;
     public List<AudioClip> audioClips;
+    [SerializeField][Range(0f, 2f)] public float volume = 1f;
     private bool isPlayer = false;
+    public List<AttackSO> combo;
 
     void Start()
     {

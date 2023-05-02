@@ -105,6 +105,10 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 8a07a17e258e3bb4ab5aa14d3791c532, type: 3}
   - {fileID: 8300000, guid: 1263011d981d02b4b85a428b41f28e16, type: 3}
   - {fileID: 8300000, guid: eda1a1a5a6db10845a2f1e2d3e79d084, type: 3}
+  combo:
+  - {fileID: 11400000, guid: beeaa2f131d8c594386179ae58349b06, type: 2}
+  - {fileID: 11400000, guid: 7fbf9ed871413ed48b87bdcc9d8e2733, type: 2}
+  - {fileID: 11400000, guid: e52b4fd52a0006e4aa38d100825eda28, type: 2}
 --- !u!65 &4800038780168969864
 BoxCollider:
   m_ObjectHideFlags: 0

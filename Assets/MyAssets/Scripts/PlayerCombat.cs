@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Animations;
 using UnityEngine;
 
 public class PlayerCombat : MonoBehaviour
@@ -12,6 +13,7 @@ public class PlayerCombat : MonoBehaviour
     Animator anim;
     [SerializeField] GameObject WeaponHolster;
     Weapon weapon;
+    [SerializeField] AnimatorController defaultController;
     void Start()
     {
         anim = GetComponent<Animator>();
@@ -21,11 +23,15 @@ public class PlayerCombat : MonoBehaviour
         {
             weapon.gameObject.tag = "CinemachineTarget";
             weapon.gameObject.layer = 8;
+            combo = WeaponHolster.GetComponentInChildren<Weapon>().combo;
         }
     }
 
     void Update()
     {
+        weapon = WeaponHolster.GetComponentInChildren<Weapon>();
+        if (weapon == null)
+            anim.runtimeAnimatorController = defaultController;
         if (Input.GetButtonDown("Fire1"))
         {
             Attack();
@@ -34,10 +40,8 @@ public class PlayerCombat : MonoBehaviour
     }
     void Attack()
     {
-        weapon = WeaponHolster.GetComponentInChildren<Weapon>();
-        if (weapon == null)
-            return;
-
+        if (weapon == null) return;
+        combo = WeaponHolster.GetComponentInChildren<Weapon>().combo;
         weapon.gameObject.tag = "CinemachineTarget";
         weapon.gameObject.layer = 8;
         if (Time.time - lastClickTime > 0.5f && comboIndex < combo.Count)
@@ -50,12 +54,9 @@ public class PlayerCombat : MonoBehaviour
                 anim.runtimeAnimatorController = combo[comboIndex].animatorOV;
                 anim.Play("Attack", 0, 0);
                 comboIndex++;
-                lastClickTime= Time.time;
-
-                if ( comboIndex >= combo.Count)
-                {
+                lastClickTime = Time.time;
+                if (comboIndex >= combo.Count)
                     comboIndex = 0;
-                }
             }
         }
     }
@@ -76,7 +77,7 @@ public class PlayerCombat : MonoBehaviour
     {
         if (weapon != null && weapon.audioClips.Count > comboIndex)
         {
-            AudioSource.PlayClipAtPoint(weapon.audioClips[comboIndex], transform.position);
+            AudioSource.PlayClipAtPoint(weapon.audioClips[comboIndex], transform.position, weapon.volume);
         }
     }
     private void OnAttackStart()
