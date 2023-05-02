@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Weapon : MonoBehaviour
@@ -9,15 +8,14 @@ public class Weapon : MonoBehaviour
     BoxCollider hitbox;
     public List<AudioClip> audioClips;
     private bool isPlayer = false;
+
     void Start()
     {
         hitbox = GetComponent<BoxCollider>();
-        // Check if this is apart of the player gameobject
-        if (transform.root.name == "Player")
-            isPlayer = true;
     }
     private void OnTriggerEnter(Collider other)
     {
+        isPlayer = transform.root.CompareTag("Player") ? true : false;
         if (isPlayer)
         {
             if (other.CompareTag("Enemy"))

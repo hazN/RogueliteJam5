@@ -8,16 +8,20 @@ public class PlayerCombat : MonoBehaviour
     float lastClickTime;
     float lastComboEnd;
     int comboIndex;
-    Weapon weaponScript = null;
 
     Animator anim;
-    [SerializeField] Weapon weapon;
+    [SerializeField] GameObject WeaponHolster;
+    Weapon weapon;
     void Start()
     {
         anim = GetComponent<Animator>();
-
         // Get weapon script reference
-        weaponScript = GetComponentInChildren<Weapon>();
+        weapon = WeaponHolster.GetComponentInChildren<Weapon>();
+        if (weapon!= null)
+        {
+            weapon.gameObject.tag = "CinemachineTarget";
+            weapon.gameObject.layer = 8;
+        }
     }
 
     void Update()
@@ -30,6 +34,12 @@ public class PlayerCombat : MonoBehaviour
     }
     void Attack()
     {
+        weapon = WeaponHolster.GetComponentInChildren<Weapon>();
+        if (weapon == null)
+            return;
+
+        weapon.gameObject.tag = "CinemachineTarget";
+        weapon.gameObject.layer = 8;
         if (Time.time - lastClickTime > 0.5f && comboIndex < combo.Count)
         {
             CancelInvoke("EndCombo");
@@ -71,10 +81,10 @@ public class PlayerCombat : MonoBehaviour
     }
     private void OnAttackStart()
     {
-        weaponScript.EnableHitbox();
+        weapon.EnableHitbox();
     }
     private void OnAttackEnd()
     {
-        weaponScript.DisableHitbox();
+        weapon.DisableHitbox();
     }
 }
