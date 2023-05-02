@@ -41,21 +41,19 @@ public class Player : MonoBehaviour
         }
     }
 
-
     private void Interact(InputAction.CallbackContext obj)
     {
-        print("Interacted?");
-        if(hit.collider != null) 
+        if (hit.collider != null)
         {
-            print("Interacted!");
-            if (hit.collider.GetComponent<Weapon>() && EquipedWeapon == null)
+            Weapon weapon = hit.collider.GetComponent<Weapon>();
+            if (weapon != null && EquipedWeapon == null)
             {
                 EquipedWeapon = hit.collider.gameObject;
-                EquipedWeapon.transform.position = Vector3.zero;
-                EquipedWeapon.transform.rotation = Quaternion.identity;
                 EquipedWeapon.transform.SetParent(WeaponHolster.transform, false);
+                EquipedWeapon.transform.localPosition = Vector3.zero;
+                EquipedWeapon.transform.localRotation = Quaternion.identity;
                 EquipedWeapon.GetComponent<Rigidbody>().isKinematic = true;
-                EquipedWeapon.GetComponent<CapsuleCollider>().enabled = false;
+                EquipedWeapon.GetComponent<Collider>().enabled = false;
             }
         }
     }

@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 using Unity.AI.Navigation;
 using Unity.VisualScripting;
+using UnityEngine.AI;
 
 public class RoomGenerator : MonoBehaviour
 {
@@ -10,6 +11,10 @@ public class RoomGenerator : MonoBehaviour
     public GameObject[] floorPrefabs;
 
     public GameObject[] wallPrefabs;
+    public GameObject[] mushroomPrefabs;
+    public GameObject[] tablePrefabs;
+    public GameObject[] lootPrefabs;
+    public GameObject[] coinPrefabs;
     public GameObject doorPrefab;
     public GameObject holePrefab;
     // Add other prefabs for room content
@@ -42,6 +47,7 @@ public class RoomGenerator : MonoBehaviour
         player.gameObject.SetActive(false);
         InstantiateFloorTiles(position);
         InstantiateWalls(position);
+        InstantiateRoomContent(position);
         surface.BuildNavMesh();
         player.gameObject.SetActive(true);
     }
@@ -100,6 +106,8 @@ public class RoomGenerator : MonoBehaviour
                 {
                     GameObject floorPrefab = floorPrefabs[Random.Range(0, floorPrefabs.Length)];
                     Instantiate(floorPrefab, tilePosition, Quaternion.identity);
+
+         
                 }
             }
         }
@@ -172,7 +180,6 @@ public class RoomGenerator : MonoBehaviour
                     }
 
                     GameObject wall = Instantiate(prefabToInstantiate, wallPosition, prefabRotation);
-
                 }
             }
         }
@@ -186,5 +193,111 @@ public class RoomGenerator : MonoBehaviour
         if (x == roomWidth / 2 && y == roomHeight) return 4;
 
         return 0;
+    }
+    private void InstantiateRoomContent(Vector3 position)
+    {
+        // Generate navmesh
+        surface.BuildNavMesh();
+
+        // Instantiate mushrooms
+        int mushroomCount = Random.Range(roomWidth + roomHeight, roomWidth * roomHeight);
+        for (int i = 0; i < mushroomCount; i++)
+        {
+            GameObject mushroomPrefab = mushroomPrefabs[Random.Range(0, mushroomPrefabs.Length)];
+
+            // Generate a random position within the room bounds
+            Vector3 mushroomPosition = position + new Vector3(Random.Range(-roomWidth / 2f, roomWidth / 2f) * 10f,
+                0f,
+                Random.Range(-roomHeight / 2f, roomHeight / 2f) * 10f);
+
+            // Sample to a valid point on the navsurface
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(mushroomPosition, out hit, 5f, NavMesh.AllAreas))
+            {
+                mushroomPosition = hit.position;// + new Vector3(0f, 0f, 0f);
+                Instantiate(mushroomPrefab, mushroomPosition, Quaternion.identity);
+            }
+        }
+
+        // Instantiate coins
+        int coinCount = Random.Range(roomWidth + roomHeight, roomWidth * roomHeight);
+        for (int i = 0; i < coinCount; i++)
+        {
+            GameObject coinPrefab = coinPrefabs[Random.Range(0, coinPrefabs.Length)];
+
+            // Generate a random position within the room bounds
+            Vector3 coinPosition = position + new Vector3(
+                Random.Range(-roomWidth / 2f, roomWidth / 2f) * 10f,
+                0f,
+                Random.Range(-roomHeight / 2f, roomHeight / 2f) * 10f);
+
+            // Sample to a valid point on the navsurface
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(coinPosition, out hit, 5f, NavMesh.AllAreas))
+            {
+                coinPosition = hit.position + new Vector3(0f, 0f, 0f);
+                Instantiate(coinPrefab, coinPosition, Quaternion.identity);
+            }
+        }
+
+        // Instantiate tables and loot
+        int tableCount = Random.Range(roomWidth + roomHeight, roomWidth * roomHeight) / 2;
+        for (int i = 0; i < tableCount; i++)
+        {
+            GameObject tablePrefab = tablePrefabs[Random.Range(0, tablePrefabs.Length)];
+
+            // Determine which edge of the room to place the table on
+            float x = 0f, z = 0f;
+            int edge = Random.Range(0, 4);
+            switch (edge)
+            {
+                case 0: // Top edge
+                    z = roomHeight / 2f * 10f;
+                    x = Random.Range(-roomWidth / 2f, roomWidth / 2f) * 10f;
+                    break;
+                case 1: // Right edge
+                    x = roomWidth / 2f * 10f;
+                    z = Random.Range(-roomHeight / 2f, roomHeight / 2f) * 10f;
+                    break;
+                case 2: // Bottom edge
+                    z = -roomHeight / 2f * 10f;
+                    x = Random.Range(-roomWidth / 2f, roomWidth / 2f) * 10f;
+                    break;
+                case 3: // Left edge
+                    x = -roomWidth / 2f * 10f;
+                    z = Random.Range(-roomHeight / 2f, roomHeight / 2f) * 10f;
+                    break;
+            }
+
+            // Calculate table position and rotation
+            Vector3 tablePosition = position + new Vector3(x, 0f, z);
+            Quaternion tableRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
+
+            // Sample a valid position on the navmesh
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(tablePosition, out hit, 5f, NavMesh.AllAreas))
+            {
+                tablePosition = hit.position + new Vector3(0f, -0.1f, 0f);
+                GameObject table = Instantiate(tablePrefab, tablePosition, tableRotation);
+
+                // Spawn loot on the table
+                if (Random.value < 0.8f)
+                {
+                    // Get the table's bounds
+                    Bounds tableBounds = table.GetComponent<MeshRenderer>().bounds;
+
+                    // Generate a random position within the bounds
+                    Vector3 lootPosition = new Vector3(
+                        Random.Range(tableBounds.min.x, tableBounds.max.x),
+                        tableBounds.max.y + 0.01f, // Place the loot just above the table
+                        Random.Range(tableBounds.min.z, tableBounds.max.z));
+
+                    // Instantiate the loot at the position and randomize rotation
+                    GameObject lootPrefab = lootPrefabs[Random.Range(0, lootPrefabs.Length)];
+                    Quaternion lootRotation = Quaternion.Euler(-90f, Random.Range(0f, 360f), 0f);
+                    Instantiate(lootPrefab, lootPosition, lootRotation, table.transform);
+                }
+            }
+        }
     }
 }

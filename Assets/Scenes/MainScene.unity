@@ -166,6 +166,30 @@ MonoBehaviour:
   - {fileID: 196870, guid: d3ce5fe83b1090246a3572735e3dd832, type: 3}
   - {fileID: 189982, guid: a475e72db2f78ba41b557ca01e7ed990, type: 3}
   - {fileID: 140754, guid: e73dff4b52d607f4ca11b85eca8f146b, type: 3}
+  mushroomPrefabs:
+  - {fileID: 156300, guid: 04fb0adabe575c0429826d73f7db3c13, type: 3}
+  - {fileID: 102790, guid: 86a753c1fed37d54bbb4a774766985a5, type: 3}
+  - {fileID: 131856, guid: f58bdefe414a9a744ab284e383341fea, type: 3}
+  - {fileID: 132666, guid: ba39ae34c46b0ac46a3e8c1de0fc4d49, type: 3}
+  - {fileID: 149668, guid: f5406e7b838fe7a4680767d1567e70c6, type: 3}
+  - {fileID: 165780, guid: a7d0bab3996f4c44299aaa2169c9bcae, type: 3}
+  - {fileID: 192026, guid: 16d7d3227049b944fb34c0d7bd878ee9, type: 3}
+  - {fileID: 158038, guid: b9cff604e7a459c4581b58993fc28f1d, type: 3}
+  - {fileID: 136120, guid: ffc6869ab4137a74d89484a41f685f9d, type: 3}
+  - {fileID: 138052, guid: 7060ec5f9f6d83b4ebcd4956b3abdf63, type: 3}
+  - {fileID: 130514, guid: 3bb5571f612e6d14d82b7a56913e82af, type: 3}
+  - {fileID: 131856, guid: f58bdefe414a9a744ab284e383341fea, type: 3}
+  tablePrefabs:
+  - {fileID: 167682, guid: 466425cd105379046beddc7cb48df13e, type: 3}
+  - {fileID: 193476, guid: 46c0fb398117dc647a6b7cb2cbba421b, type: 3}
+  lootPrefabs:
+  - {fileID: 1830856044}
+  - {fileID: 238361220}
+  coinPrefabs:
+  - {fileID: 122892, guid: 20002ad77119e9849a8815f85c128ba3, type: 3}
+  - {fileID: 147436, guid: c7a5c2b51e6ab424fb46547daf81a610, type: 3}
+  - {fileID: 187062, guid: 3da6cabdb2d06ad4ab1068a9b2a231cd, type: 3}
+  - {fileID: 190932, guid: 20e0bf298681fcd4693097c822277593, type: 3}
   doorPrefab: {fileID: 4352636545746703722, guid: c7a69273fe921d640a4a4d1819b87056,
     type: 3}
   holePrefab: {fileID: 146270, guid: 41eeee7ac6cd71342a13a0fc4a0a0308, type: 3}
@@ -219,6 +243,12 @@ MonoBehaviour:
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 0}
   m_BuildHeightMesh: 0
+--- !u!1 &238361220 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3471424119950353194, guid: 9c33dce75128a7141a1bfda2215db97b,
+    type: 3}
+  m_PrefabInstance: {fileID: 460686419}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &260073020
 GameObject:
   m_ObjectHideFlags: 0
@@ -5816,6 +5846,12 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!1 &1830856044 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7184038905782650659, guid: 650e1c2a30631a046a316eaa00b0c03e,
+    type: 3}
+  m_PrefabInstance: {fileID: 1208267867}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2071986674
 GameObject:
   m_ObjectHideFlags: 0
