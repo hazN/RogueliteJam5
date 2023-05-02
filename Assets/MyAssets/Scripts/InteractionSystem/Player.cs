@@ -46,14 +46,28 @@ public class Player : MonoBehaviour
         if (hit.collider != null)
         {
             Weapon weapon = hit.collider.GetComponent<Weapon>();
-            if (weapon != null && EquipedWeapon == null)
+            if (weapon != null)
             {
+                if (EquipedWeapon != null)
+                {
+                    Drop(obj);
+                }
                 EquipedWeapon = hit.collider.gameObject;
                 EquipedWeapon.transform.SetParent(WeaponHolster.transform, false);
                 EquipedWeapon.transform.localPosition = Vector3.zero;
                 EquipedWeapon.transform.localRotation = Quaternion.identity;
                 EquipedWeapon.GetComponent<Rigidbody>().isKinematic = true;
                 EquipedWeapon.GetComponent<Collider>().enabled = false;
+                EquipedWeapon.layer = 0;
+            }
+            else
+            {
+                Consumable consumable = hit.collider.GetComponent<Consumable>();
+                if (consumable != null)
+                {
+                    consumable.Consume();
+                    pickUpText.gameObject.SetActive(false);
+                }
             }
         }
     }
@@ -61,21 +75,15 @@ public class Player : MonoBehaviour
     void Update()
     {
         Debug.DrawRay(playerCameraTransform.position, playerCameraTransform.forward * pickUpDistance, Color.red);
-        if (hit.collider != null)
+        pickUpText.gameObject.SetActive(false);
+        if (Physics.SphereCast(playerCameraTransform.position, 0.5f, playerCameraTransform.forward, out hit, pickUpDistance, pickableLayerMask))
         {
-            hit.collider.GetComponent<Highlight>().ToggleHighlight(false);
-            pickUpText.gameObject.SetActive(false);
-        }
-        if (EquipedWeapon != null)
-        {
-            return;
-        }
-        if (Physics.Raycast(playerCameraTransform.position, playerCameraTransform.forward, out hit, pickUpDistance, pickableLayerMask))
-        {
-            hit.collider.GetComponent<Highlight>()?.ToggleHighlight(true);
             pickUpText.gameObject.SetActive(true);
             pickUpText.transform.position = Camera.main.WorldToScreenPoint(hit.collider.transform.position + Vector3.up * 1.1f);
-            pickUpText.text = "Press E to Pick Up " + hit.collider.name;
+            if (hit.collider.GetComponent<Weapon>() != null)
+                pickUpText.text = "Press E to Pick Up " + hit.collider.name + " (" + hit.collider.GetComponent<Weapon>().combo.Count + " combo)";
+            else
+                pickUpText.text = "Press E to Eat ";
         }
     }
 }
