@@ -7,6 +7,8 @@ TagManager:
   - CinemachineTarget
   - PlayerSword
   - Enemy
+  - Door
+  - RoomText
   layers:
   - Default
   - TransparentFX

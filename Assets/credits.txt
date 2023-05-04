@@ -1,2 +1,3 @@
 Models: Synty 
 RPG Sounds: https://opengameart.org/content/rpg-sound-pack
+UI Icons: https://game-icons.net/

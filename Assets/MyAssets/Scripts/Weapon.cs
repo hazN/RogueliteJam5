@@ -17,6 +17,10 @@ public class Weapon : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
+        // Make sure hitbox is enabled
+        if (!hitbox.enabled)
+            return;
+        // Check if its a player or enemy
         isPlayer = transform.root.CompareTag("Player") ? true : false;
         if (isPlayer)
         {

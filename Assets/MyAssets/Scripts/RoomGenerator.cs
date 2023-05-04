@@ -17,7 +17,9 @@ public class RoomGenerator : MonoBehaviour
     public GameObject[] coinPrefabs;
     public GameObject doorPrefab;
     public GameObject holePrefab;
-    // Add other prefabs for room content
+    public int roomNumber = 0;
+
+    private GameObject[] doors;
 
     // Room generation settings
     public int roomWidth;
@@ -50,6 +52,11 @@ public class RoomGenerator : MonoBehaviour
         InstantiateRoomContent(position);
         surface.BuildNavMesh();
         player.gameObject.SetActive(true);
+        doors = GameObject.FindGameObjectsWithTag("Door");
+        foreach (GameObject door in doors)
+        {
+            door.GetComponent<Door>().RoomCompleted();
+        }
     }
 
     private void InstantiateFloorTiles(Vector3 position)
@@ -106,8 +113,6 @@ public class RoomGenerator : MonoBehaviour
                 {
                     GameObject floorPrefab = floorPrefabs[Random.Range(0, floorPrefabs.Length)];
                     Instantiate(floorPrefab, tilePosition, Quaternion.identity);
-
-         
                 }
             }
         }
@@ -151,12 +156,14 @@ public class RoomGenerator : MonoBehaviour
                         if (x == roomWidth / 2 && y == -1)
                         {
                             prefabToInstantiate = doorPrefab;
+                            prefabToInstantiate.transform.position += transform.right * 2.5f;
                             doorPlaced = true;
                         }
                         // Place a door on the other walls
                         else if (doorWalls.Contains(GetWallNumber(x, y, roomWidth, roomHeight)))
                         {
                             prefabToInstantiate = doorPrefab;
+                            prefabToInstantiate.transform.position += transform.right * 2.5f;
                             doorPlaced = true;
                         }
                     }
@@ -180,6 +187,10 @@ public class RoomGenerator : MonoBehaviour
                     }
 
                     GameObject wall = Instantiate(prefabToInstantiate, wallPosition, prefabRotation);
+                    if (doorPlaced && h == 0)
+                    {
+                        wall.transform.position += wall.transform.right * -2.5f;
+                    }
                 }
             }
         }
@@ -285,16 +296,11 @@ public class RoomGenerator : MonoBehaviour
                 {
                     // Get the table's bounds
                     Bounds tableBounds = table.GetComponent<MeshRenderer>().bounds;
-
-                    // Generate a random position within the bounds
-                    Vector3 lootPosition = new Vector3(
-                        Random.Range(tableBounds.min.x, tableBounds.max.x),
-                        tableBounds.max.y + 0.01f, // Place the loot just above the table
-                        Random.Range(tableBounds.min.z, tableBounds.max.z));
-
+                    Vector3 lootPosition = new Vector3(table.transform.position.x, table.transform.position.y + tableBounds.extents.y * 2f, table.transform.position.z);
                     // Instantiate the loot at the position and randomize rotation
                     GameObject lootPrefab = lootPrefabs[Random.Range(0, lootPrefabs.Length)];
                     Quaternion lootRotation = Quaternion.Euler(-90f, Random.Range(0f, 360f), 0f);
+                    lootPrefab.GetComponent<Rigidbody>().isKinematic = true;
                     Instantiate(lootPrefab, lootPosition, lootRotation, table.transform);
                 }
             }

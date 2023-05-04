@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 3320964}
   - component: {fileID: 2312722}
   - component: {fileID: 64727393637089700}
+  - component: {fileID: -932544272643596254}
+  - component: {fileID: -7852645109973785154}
   m_Layer: 0
   m_Name: SM_Env_GlowingOrb_02
   m_TagString: Untagged
@@ -98,3 +100,34 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 43944449198229586, guid: a0d772689a07c7e43b780dfa1174a772, type: 2}
+--- !u!65 &-932544272643596254
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 147436}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.2558017, y: 2.0617206, z: 1.6462871}
+  m_Center: {x: -0.00000023841858, y: 1.0308603, z: -0.000000059604645}
+--- !u!114 &-7852645109973785154
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 147436}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: faec49fa7ceaa8044a79dadf3b9d142e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  goldValue: 1
+  audioClips:
+  - {fileID: 8300000, guid: f42b1f43f32b13b47b81c65edf533c2f, type: 3}
+  - {fileID: 8300000, guid: 8dee24dff58f74b43995c19048587161, type: 3}
+  - {fileID: 8300000, guid: 751ac0eaf95ed7c4bac03d0a3f38fa14, type: 3}
+  volume: 0.5

@@ -4,12 +4,14 @@ using System.Net.Sockets;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class Health : MonoBehaviour
 {
     // Start is called before the first frame update
-    public float maxHealth = 100;
-    public float currentHealth;
+    [SerializeField] public float maxHealth = 100;
+    [SerializeField] public float currentHealth;
+    [SerializeField] private Slider healthBar;
     Animator anim;
     void Start()
     {
@@ -30,6 +32,10 @@ public class Health : MonoBehaviour
             transform.position -= direction * 0.25f;
         }
         currentHealth -= damage;
+        if (healthBar)
+        {
+            healthBar.value = currentHealth / maxHealth;
+        }
         if (currentHealth <= 0)
         {
             Die();
