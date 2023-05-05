@@ -18,6 +18,17 @@ public class Health : MonoBehaviour
         currentHealth = maxHealth;
         anim = GetComponent<Animator>();
     }
+    public bool Heal(float hp)
+    {
+        // Return false if already max hp
+        if (currentHealth == maxHealth) 
+            return false;
+        // Otherwise heal
+        currentHealth = Mathf.Min(currentHealth + hp, maxHealth);
+        if (healthBar)
+            healthBar.value = currentHealth / maxHealth;
+        return true;
+    }
     public void TakeDamage(float damage)
     {
         anim.SetTrigger("takeDamage");

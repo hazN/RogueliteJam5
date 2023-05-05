@@ -8,10 +8,7 @@ public class Consumable : MonoBehaviour
     public void Consume()
     {
         Health playerHealth = GameObject.FindGameObjectWithTag("Player").GetComponent<Health>();
-        if (playerHealth.currentHealth < playerHealth.maxHealth ) 
-        {
-            playerHealth.currentHealth = Mathf.Min(playerHealth.currentHealth + healthAmount, playerHealth.maxHealth);
+        if (playerHealth.Heal(healthAmount)) 
             Destroy(gameObject);
-        }
     }
 }

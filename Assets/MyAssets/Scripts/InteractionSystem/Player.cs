@@ -1,11 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 using UnityEngine.InputSystem;
-using System;
-using System.Runtime;
-using UnityEditor.Rendering.LookDev;
 
 public class Player : MonoBehaviour
 {
@@ -19,6 +14,7 @@ public class Player : MonoBehaviour
     [SerializeField] private InputActionReference interactionInput, dropInput, useInput;
     [SerializeField] private int playerCoins = 0;
     private RaycastHit hit;
+
     private void Start()
     {
         interactionInput.action.performed += Interact;
@@ -48,6 +44,7 @@ public class Player : MonoBehaviour
     {
         if (hit.collider != null)
         {
+            // Check if its a weapon
             Weapon weapon = hit.collider.GetComponent<Weapon>();
             if (weapon != null)
             {
@@ -62,20 +59,27 @@ public class Player : MonoBehaviour
                 EquipedWeapon.GetComponent<Rigidbody>().isKinematic = true;
                 EquipedWeapon.GetComponent<Collider>().enabled = false;
                 EquipedWeapon.layer = 0;
+                return;
             }
-            else
+            // Check if its a consumable(mushroom)
+            Consumable consumable = hit.collider.GetComponent<Consumable>();
+            if (consumable != null)
             {
-                Consumable consumable = hit.collider.GetComponent<Consumable>();
-                if (consumable != null)
+                consumable.Consume();
+                pickUpText.gameObject.SetActive(false);
+            }
+            // Check if its a door
+            if (hit.collider.GetComponent(typeof(Door)) is Door door)
+            {
+                if (door.isActive)
                 {
-                    consumable.Consume();
-                    pickUpText.gameObject.SetActive(false);
+                    door.OpenDoor();
                 }
             }
         }
     }
 
-    void Update()
+    private void Update()
     {
         coinsText.text = playerCoins.ToString();
         Debug.DrawRay(playerCameraTransform.position, playerCameraTransform.forward * pickUpDistance, Color.red);
@@ -87,19 +91,20 @@ public class Player : MonoBehaviour
             if (hit.collider.GetComponent<Weapon>() != null)
             {
                 pickUpText.transform.rotation = Quaternion.identity;
-                pickUpText.text = "Press E to Pick Up " + hit.collider.name + " (" + hit.collider.GetComponent<Weapon>().combo.Count + " combo)";
+                pickUpText.text = "Press E to Pick Up " + hit.collider.name + " (" + hit.collider.GetComponent<Weapon>().damage.x + "-" + hit.collider.GetComponent<Weapon>().damage.y + " dmg)";
             }
             else if (hit.collider.GetComponent(typeof(Door)) is Door door)
             {
                 if (door.isActive)
                 {
-                    // rotate text on y axis 
+                    // rotate text on y axis
                     pickUpText.transform.rotation *= Quaternion.Euler(0f, 0.3f, 0f);
                     // change text based on rotation
                     if (pickUpText.transform.rotation.eulerAngles.y >= 180f)
                     {
                         pickUpText.text = door.getRoomType(door.roomType2).ToString() + " " + door.room2Level;
-                    } else pickUpText.text = door.getRoomType(door.roomType1).ToString() + " " + door.room1Level;
+                    }
+                    else pickUpText.text = door.getRoomType(door.roomType1).ToString() + " " + door.room1Level;
                 }
             }
             else
@@ -109,14 +114,17 @@ public class Player : MonoBehaviour
             }
         }
     }
+
     public void addCoins(int goldValue)
     {
         playerCoins += goldValue;
     }
+
     public int getCoins()
     {
         return playerCoins;
     }
+
     public bool removeCoins(int coinsToRemove)
     {
         if (coinsToRemove <= playerCoins)

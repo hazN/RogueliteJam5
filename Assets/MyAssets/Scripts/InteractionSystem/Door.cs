@@ -5,7 +5,7 @@ using TMPro;
 
 public class Door : MonoBehaviour
 {
-    public enum RoomType { Basic, Miniboss, Boss, Health, Gold, Upgrade }
+    public enum RoomType { Basic, Health, Gold, Loot}
     [SerializeField] Transform playerTransform;
     public bool isActive = false;
     public RoomType roomType1;
@@ -20,7 +20,6 @@ public class Door : MonoBehaviour
         roomType2 = (RoomType)Random.Range(0, System.Enum.GetValues(typeof(RoomType)).Length);
         room1Level = Random.Range(1, 3);
         room2Level = Random.Range(1, 3);
-        playerTransform = GameObject.Find("PlayerArmature").transform;
     }
     private void Update()
     {
@@ -39,6 +38,15 @@ public class Door : MonoBehaviour
     {
         if (isActive)
         {
+            int room = Random.Range(1, 2);
+            if (room == 1)
+            {
+                GameObject.Find("DungeonManager").GetComponent<RoomGenerator>().GenerateRoom(roomType1, room1Level, new Vector3(0f,0f,0f));
+            }
+            else
+            {
+                GameObject.Find("DungeonManager").GetComponent<RoomGenerator>().GenerateRoom(roomType2, room2Level, new Vector3(0f,0f,0f));
+            }
         }
     }
     public string getRoomType(RoomType room)
@@ -47,16 +55,12 @@ public class Door : MonoBehaviour
         {
             case RoomType.Basic:
                 return "Basic";
-            case RoomType.Miniboss:
-                return "Miniboss";
-            case RoomType.Boss:
-                return "Boss";
             case RoomType.Health:
                 return "Health";
             case RoomType.Gold:
                 return "Gold";
-            case RoomType.Upgrade:
-                return "Upgrade";
+            case RoomType.Loot:
+                return "Loot";
             default:
                 return "UnknownRoom";
         }
