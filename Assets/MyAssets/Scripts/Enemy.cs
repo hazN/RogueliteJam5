@@ -6,6 +6,7 @@ public class Enemy : MonoBehaviour
     public GameObject player;
     Weapon weaponScript;
 
+    public int level = 1;
     public float aggroDistance = 10f;
     public float attackDistance = 1.1f;
 

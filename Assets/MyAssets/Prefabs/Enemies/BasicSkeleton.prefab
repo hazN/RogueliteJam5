@@ -93,7 +93,7 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5299382494960746147}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 0.172863, y: 0.68574417, z: 0.09491253}
@@ -110,7 +110,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f7f2495c7757804c807e8e525b6dcb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: {x: 1, y: 4}
+  damage: {x: 6, y: 10}
   audioClips:
   - {fileID: 8300000, guid: 8a07a17e258e3bb4ab5aa14d3791c532, type: 3}
   volume: 0.25
@@ -1085,7 +1085,7 @@ GameObject:
   - component: {fileID: 5299382495306794369}
   - component: {fileID: 5299382495306794368}
   m_Layer: 9
-  m_Name: BasicGoblin
+  m_Name: BasicSkeleton
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1170,7 +1170,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a473041ca480d1f48ab76e66d81d13bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 30
+  maxHealth: 70
   currentHealth: 0
   healthBar: {fileID: 0}
 --- !u!114 &5299382495306794398
@@ -3277,7 +3277,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &5299382495703676992
 Transform:
   m_ObjectHideFlags: 0
@@ -4475,7 +4475,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5299382495703597610
 Transform:
   m_ObjectHideFlags: 0

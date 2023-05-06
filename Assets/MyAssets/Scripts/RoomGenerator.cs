@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UIElements;
 
 public class RoomGenerator : MonoBehaviour
 {
@@ -14,21 +16,25 @@ public class RoomGenerator : MonoBehaviour
     [SerializeField] private GameObject[] tablePrefabs;
     [SerializeField] private GameObject[] lootPrefabs;
     [SerializeField] private GameObject[] coinPrefabs;
+    [SerializeField] private GameObject[] enemyPrefabs;
     [SerializeField] private GameObject doorPrefab;
     [SerializeField] private GameObject holePrefab;
+    [SerializeField] private GameObject roofPrefab;
+    [SerializeField] private TextMeshProUGUI roomTextNumber;
     public int roomNumber = 0;
     private Door.RoomType roomType = Door.RoomType.Basic;
     private int roomLevel = 1;
     private GameObject[] doors;
     private GameObject entranceDoor;
+
     // Store roomcontent so its easy to destroy later
     private GameObject roomContent;
 
     // Room generation settings
-    public int roomWidth;
-
-    public int roomHeight;
-    public float holeProbability = 0.1f;
+    [SerializeField] private float tileSize = 4.9f;
+    [SerializeField] private int roomWidth;
+    [SerializeField] private int roomHeight;
+    [SerializeField] private  float holeProbability = 0.1f;
 
     // Navmesh
     [SerializeField] private NavMeshSurface surface;
@@ -38,32 +44,10 @@ public class RoomGenerator : MonoBehaviour
     private void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-        //GenerateInitialRoom();
     }
 
     private void Update()
     {
-    }
-
-    private void GenerateInitialRoom()
-    {
-        GenerateRoom(Vector3.zero);
-    }
-
-    public void GenerateRoom(Vector3 position)
-    {
-        player.gameObject.SetActive(false);
-        roomContent = new GameObject("RoomContent");
-        InstantiateFloorTiles(position);
-        InstantiateWalls(position);
-        InstantiateRoomContent(position);
-        surface.BuildNavMesh();
-        player.gameObject.SetActive(true);
-        doors = GameObject.FindGameObjectsWithTag("Door");
-        foreach (GameObject door in doors)
-        {
-            door.GetComponent<Door>().RoomCompleted();
-        }
     }
 
     private void InstantiateFloorTiles(Vector3 position)
@@ -83,7 +67,21 @@ public class RoomGenerator : MonoBehaviour
 
             if (!holePositions.Contains(holePosition))
             {
-                holePositions.Add(holePosition);
+                // Make sure holes are not placed next to doors
+                bool placeHole = true;
+                // Find and loop through all doors
+                doors = GameObject.FindGameObjectsWithTag("Door");
+                foreach (GameObject door in doors)
+                {
+                    // If the hole is next to a door, don't place it
+                    if (Vector3.Distance(door.transform.position, new Vector3(holePosition.x, 0f, holePosition.y)) <tileSize)
+                    {
+                        placeHole = false;
+                        break;
+                    }
+                }
+                if (placeHole)
+                    holePositions.Add(holePosition);
             }
         }
 
@@ -116,7 +114,7 @@ public class RoomGenerator : MonoBehaviour
         {
             for (int y = 0; y < roomHeight; y++)
             {
-                Vector3 tilePosition = position + new Vector3(x * 5f, 0, y * 5f);
+                Vector3 tilePosition = position + new Vector3(x *tileSize, 0, y *tileSize);
                 if (holePositions.Contains(new Vector2Int(x, y)))
                 {
                     // Hole
@@ -128,8 +126,17 @@ public class RoomGenerator : MonoBehaviour
                 }
             }
         }
-    }
 
+        //// Instantiate roof tiles
+        //for (int x = 0; x < roomWidth; x++)
+        //{
+        //    for (int y = 0; y < roomHeight; y++)
+        //    {
+        //        Vector3 tilePosition = position + new Vector3(x *tileSize,tileSize, y *tileSize);
+        //        GameObject roofTile = Instantiate(roofPrefab, tilePosition, Quaternion.identity, roomContent.transform);
+        //    }
+        //}
+    }
     private void InstantiateWalls(Vector3 position)
     {
         int wallHeight = 2;
@@ -155,9 +162,9 @@ public class RoomGenerator : MonoBehaviour
                 for (int h = 0; h < wallHeight; h++)
                 {
                     Vector3 wallPosition = position + new Vector3(
-                        x * 5f + ((x == roomWidth) ? -5f : 0),
-                        h * 5f,
-                        y * 5f + ((y == roomHeight) ? 0f : 5f));
+                        x *tileSize + ((x == roomWidth) ? -5f : 0),
+                        h *tileSize,
+                        y *tileSize + ((y == roomHeight) ? 0f :tileSize));
 
                     GameObject prefabToInstantiate = wallPrefabs[Random.Range(0, wallPrefabs.Length)];
                     Quaternion prefabRotation = Quaternion.identity;
@@ -206,8 +213,11 @@ public class RoomGenerator : MonoBehaviour
                     if (doorPlaced && h == 0)
                     {
                         wall.transform.position += wall.transform.right * -2.5f;
-                        entranceDoor = wall;
-                        entranceDoor.name = "EntranceDoor";
+                        if (wall.layer == 0)
+                        {
+                            entranceDoor = wall;
+                            entranceDoor.name = "EntranceDoor";
+                        }
                     }
                 }
             }
@@ -224,118 +234,15 @@ public class RoomGenerator : MonoBehaviour
         return 0;
     }
 
-    private void InstantiateRoomContent(Vector3 position)
-    {
-        // Generate navmesh
-        surface.BuildNavMesh();
-
-        // Instantiate mushrooms
-        int mushroomCount = Random.Range(roomWidth + roomHeight, roomWidth * roomHeight);
-        for (int i = 0; i < mushroomCount; i++)
-        {
-            GameObject mushroomPrefab = mushroomPrefabs[Random.Range(0, mushroomPrefabs.Length)];
-
-            // Generate a random position within the room bounds
-            Vector3 mushroomPosition = position + new Vector3(Random.Range(-roomWidth / 2f, roomWidth / 2f) * 10f,
-                0f,
-                Random.Range(-roomHeight / 2f, roomHeight / 2f) * 10f);
-
-            // Sample to a valid point on the navsurface
-            NavMeshHit hit;
-            if (NavMesh.SamplePosition(mushroomPosition, out hit, 5f, NavMesh.AllAreas))
-            {
-                mushroomPosition = hit.position;// + new Vector3(0f, 0f, 0f);
-                Instantiate(mushroomPrefab, mushroomPosition, Quaternion.identity, roomContent.transform);
-            }
-        }
-
-        // Instantiate coins
-        int coinCount = Random.Range(roomWidth + roomHeight, roomWidth * roomHeight);
-        for (int i = 0; i < coinCount; i++)
-        {
-            GameObject coinPrefab = coinPrefabs[Random.Range(0, coinPrefabs.Length)];
-
-            // Generate a random position within the room bounds
-            Vector3 coinPosition = position + new Vector3(
-                Random.Range(-roomWidth / 2f, roomWidth / 2f) * 10f,
-                0f,
-                Random.Range(-roomHeight / 2f, roomHeight / 2f) * 10f);
-
-            // Sample to a valid point on the navsurface
-            NavMeshHit hit;
-            if (NavMesh.SamplePosition(coinPosition, out hit, 5f, NavMesh.AllAreas))
-            {
-                coinPosition = hit.position + new Vector3(0f, 0f, 0f);
-                Instantiate(coinPrefab, coinPosition, Quaternion.identity);
-            }
-        }
-
-        // Instantiate tables and loot
-        int tableCount = Random.Range(roomWidth + roomHeight, roomWidth * roomHeight) / 2;
-        for (int i = 0; i < tableCount; i++)
-        {
-            GameObject tablePrefab = tablePrefabs[Random.Range(0, tablePrefabs.Length)];
-
-            // Determine which edge of the room to place the table on
-            float x = 0f, z = 0f;
-            int edge = Random.Range(0, 4);
-            switch (edge)
-            {
-                case 0: // Top edge
-                    z = roomHeight / 2f * 10f;
-                    x = Random.Range(-roomWidth / 2f, roomWidth / 2f) * 10f;
-                    break;
-
-                case 1: // Right edge
-                    x = roomWidth / 2f * 10f;
-                    z = Random.Range(-roomHeight / 2f, roomHeight / 2f) * 10f;
-                    break;
-
-                case 2: // Bottom edge
-                    z = -roomHeight / 2f * 10f;
-                    x = Random.Range(-roomWidth / 2f, roomWidth / 2f) * 10f;
-                    break;
-
-                case 3: // Left edge
-                    x = -roomWidth / 2f * 10f;
-                    z = Random.Range(-roomHeight / 2f, roomHeight / 2f) * 10f;
-                    break;
-            }
-
-            // Calculate table position and rotation
-            Vector3 tablePosition = position + new Vector3(x, 0f, z);
-            Quaternion tableRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
-
-            // Sample a valid position on the navmesh
-            NavMeshHit hit;
-            if (NavMesh.SamplePosition(tablePosition, out hit, 5f, NavMesh.AllAreas))
-            {
-                tablePosition = hit.position + new Vector3(0f, -0.1f, 0f);
-                GameObject table = Instantiate(tablePrefab, tablePosition, tableRotation, roomContent.transform);
-
-                // Spawn loot on the table
-                if (Random.value < 0.8f)
-                {
-                    // Get the table's bounds
-                    Bounds tableBounds = table.GetComponent<MeshRenderer>().bounds;
-                    Vector3 lootPosition = new Vector3(table.transform.position.x, table.transform.position.y + tableBounds.extents.y * 2f, table.transform.position.z);
-                    // Instantiate the loot at the position and randomize rotation
-                    GameObject lootPrefab = lootPrefabs[Random.Range(0, lootPrefabs.Length)];
-                    Quaternion lootRotation = Quaternion.Euler(-90f, Random.Range(0f, 360f), 0f);
-                    lootPrefab.GetComponent<Rigidbody>().isKinematic = true;
-                    Instantiate(lootPrefab, lootPosition, lootRotation, table.transform);
-                }
-            }
-        }
-    }
-
     public void GenerateRoom(Door.RoomType _roomType, int _roomLevel, Vector3 _position)
     {
         roomNumber++;
+        roomTextNumber.text = roomNumber.ToString();
         player.gameObject.SetActive(false);
         if (roomContent)
             Destroy(roomContent);
         roomContent = new GameObject("RoomContent");
+        roomContent.transform.parent = GameObject.Find("DungeonManager").transform;
 
         // Randomize width based on room level
         int[] minSizes = { 3, 4, 6 };
@@ -355,6 +262,8 @@ public class RoomGenerator : MonoBehaviour
 
         // Rebuild navmesh to include content like tables
         surface.BuildNavMesh();
+        // Spawn enemies
+        InstantiateEnemies(_position);
         player.gameObject.SetActive(true);
 
         // Move player to entrance of the room
@@ -376,7 +285,7 @@ public class RoomGenerator : MonoBehaviour
     private void InstantiateRoomContent(Vector3 position, Door.RoomType roomType, int roomLevel)
     {
         // Generate navmesh to use to find valid points to place stuff
-        surface.BuildNavMesh();
+        //surface.BuildNavMesh();
 
         int mushroomCount = Random.Range(roomWidth + roomHeight, roomWidth * roomHeight);
         int coinCount = Random.Range(roomWidth + roomHeight, roomWidth * roomHeight);
@@ -390,7 +299,7 @@ public class RoomGenerator : MonoBehaviour
 
             case Door.RoomType.Health:
                 // More mushrooms, less coins and loot
-                mushroomCount = Mathf.RoundToInt(mushroomCount * 1.5f);
+                mushroomCount = Mathf.RoundToInt(mushroomCount * 2.5f);
                 coinCount = Mathf.RoundToInt(coinCount * 0.5f);
                 tableCount = Mathf.RoundToInt(tableCount * 0.8f);
                 break;
@@ -398,7 +307,7 @@ public class RoomGenerator : MonoBehaviour
             case Door.RoomType.Gold:
                 // More coins, less mushrooms and loot
                 mushroomCount = Mathf.RoundToInt(mushroomCount * 0.5f);
-                coinCount = Mathf.RoundToInt(coinCount * 1.5f);
+                coinCount = Mathf.RoundToInt(coinCount * 2.5f);
                 tableCount = Mathf.RoundToInt(tableCount * 0.8f);
                 break;
 
@@ -406,7 +315,7 @@ public class RoomGenerator : MonoBehaviour
                 // More loot, less mushrooms and coins
                 mushroomCount = Mathf.RoundToInt(mushroomCount * 0.8f);
                 coinCount = Mathf.RoundToInt(coinCount * 0.8f);
-                tableCount = Mathf.RoundToInt(tableCount * 1.5f);
+                tableCount = Mathf.RoundToInt(tableCount * 2.5f);
                 break;
         }
 
@@ -422,7 +331,7 @@ public class RoomGenerator : MonoBehaviour
 
             // Sample to a valid point on the navsurface
             NavMeshHit hit;
-            if (NavMesh.SamplePosition(mushroomPosition, out hit, 5f, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(mushroomPosition, out hit,tileSize, NavMesh.AllAreas))
             {
                 mushroomPosition = hit.position;// + new Vector3(0f, 0f, 0f);
                 Instantiate(mushroomPrefab, mushroomPosition, Quaternion.identity, roomContent.transform);
@@ -442,7 +351,7 @@ public class RoomGenerator : MonoBehaviour
 
             // Sample to a valid point on the navsurface
             NavMeshHit hit;
-            if (NavMesh.SamplePosition(coinPosition, out hit, 5f, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(coinPosition, out hit,tileSize, NavMesh.AllAreas))
             {
                 coinPosition = hit.position + new Vector3(0f, 0f, 0f);
                 Instantiate(coinPrefab, coinPosition, Quaternion.identity, roomContent.transform);
@@ -461,22 +370,22 @@ public class RoomGenerator : MonoBehaviour
             {
                 case 0: // Top edge
                     z = roomHeight / 2f * 10f;
-                    x = Random.Range(-roomWidth / 2f, roomWidth / 2f) * 10f;
+                    x = Random.Range(-roomWidth / 2.1f, roomWidth / 2.1f) * 10f;
                     break;
 
                 case 1: // Right edge
                     x = roomWidth / 2f * 10f;
-                    z = Random.Range(-roomHeight / 2f, roomHeight / 2f) * 10f;
+                    z = Random.Range(-roomHeight / 2.1f, roomHeight / 2.1f) * 10f;
                     break;
 
                 case 2: // Bottom edge
                     z = -roomHeight / 2f * 10f;
-                    x = Random.Range(-roomWidth / 2f, roomWidth / 2f) * 10f;
+                    x = Random.Range(-roomWidth / 2.1f, roomWidth / 2.1f) * 10f;
                     break;
 
                 case 3: // Left edge
                     x = -roomWidth / 2f * 10f;
-                    z = Random.Range(-roomHeight / 2f, roomHeight / 2f) * 10f;
+                    z = Random.Range(-roomHeight / 2.1f, roomHeight / 2.1f) * 10f;
                     break;
             }
 
@@ -486,7 +395,7 @@ public class RoomGenerator : MonoBehaviour
 
             // Sample a valid position on the navmesh
             NavMeshHit hit;
-            if (NavMesh.SamplePosition(tablePosition, out hit, 5f, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(tablePosition, out hit,tileSize, NavMesh.AllAreas))
             {
                 tablePosition = hit.position + new Vector3(0f, -0.1f, 0f);
                 GameObject table = Instantiate(tablePrefab, tablePosition, tableRotation, roomContent.transform);
@@ -503,6 +412,66 @@ public class RoomGenerator : MonoBehaviour
                     lootPrefab.GetComponent<Rigidbody>().isKinematic = true;
                     Instantiate(lootPrefab, lootPosition, lootRotation, table.transform);
                 }
+            }
+        }
+    }
+
+    private void InstantiateEnemies(Vector3 position)
+    {
+        int enemyCount = 0;
+        switch (roomType)
+        {
+            default:
+                {
+                    // Default amount of enemies
+                    enemyCount = Random.Range(roomWidth + roomHeight, roomWidth * roomHeight);
+                    break;
+                }
+        }
+
+        // Probability to spawn each enemy type
+        float level1Prob = 0.7f - (0.05f * roomNumber);
+        float level2Prob = 0.25f + (0.025f * roomNumber);
+        float level3Prob = 0.05f + (0.025f * roomNumber);
+
+        // Normalize probabilities
+        float sum = level1Prob + level2Prob + level3Prob;
+        level1Prob /= sum;
+        level2Prob /= sum;
+        level3Prob /= sum;
+
+        // Instantiate the enemies
+        for (int i = 0; i < enemyCount; i++)
+        {
+            // Generate a random position within the room bounds
+            Vector3 enemyPosition = position + new Vector3(Random.Range(-roomWidth / 2.1f, roomWidth / 2.1f) * 10f,
+                0f,
+                Random.Range(-roomHeight / 2.1f, roomHeight / 2.1f) * 10f);
+
+            // Sample to a valid point on the navsurface
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(enemyPosition, out hit,tileSize, NavMesh.AllAreas))
+            {
+                // Decide which enemy to instantiate based on the probabilities
+                float rand = Random.value;
+                GameObject enemy = null;
+                if (rand < level1Prob)
+                {
+                    enemy = Instantiate(enemyPrefabs[0]);
+                }
+                else if (rand < level1Prob + level2Prob)
+                {
+                    enemy = Instantiate(enemyPrefabs[1]);
+                }
+                else
+                {
+                    enemy = Instantiate(enemyPrefabs[2]);
+                }
+                enemy.transform.position = enemyPosition;
+                enemy.transform.parent = roomContent.transform;
+                // Increase damage based on level too
+                float damageFactor = 1.0f + (0.01f * roomNumber);
+                enemy.GetComponentInChildren<Weapon>().damage *= damageFactor;
             }
         }
     }
