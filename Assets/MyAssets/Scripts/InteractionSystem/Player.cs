@@ -91,7 +91,7 @@ public class Player : MonoBehaviour
             if (hit.collider.GetComponent<Weapon>() != null)
             {
                 pickUpText.transform.rotation = Quaternion.identity;
-                pickUpText.text = "Press E to Pick Up " + hit.collider.name + " (" + hit.collider.GetComponent<Weapon>().damage.x + "-" + hit.collider.GetComponent<Weapon>().damage.y + " dmg)";
+                pickUpText.text = "Press E to Pick Up " + hit.collider.name + " (" + hit.collider.GetComponent<Weapon>().damage.x.ToString("0.00") + "-" + hit.collider.GetComponent<Weapon>().damage.y.ToString("0.00") + " dmg)";
             }
             else if (hit.collider.GetComponent(typeof(Door)) is Door door)
             {

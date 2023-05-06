@@ -1028,7 +1028,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!136 &5299382495306794394
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1037,8 +1036,17 @@ CapsuleCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5299382495703263664}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 0
+  m_ProvidesContacts: 0
   m_Enabled: 1
+  serializedVersion: 2
   m_Radius: 0.35
   m_Height: 1.636528
   m_Direction: 1
@@ -1125,10 +1133,21 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5299382495703263664}
-  serializedVersion: 2
+  serializedVersion: 4
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
   m_UseGravity: 0
   m_IsKinematic: 1
   m_Interpolate: 0
@@ -4931,6 +4950,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 6773622952610597002}
     m_Modifications:
     - target: {fileID: 173842, guid: 34576738923b14941a286d5fc7d3c9f6, type: 3}
@@ -4992,6 +5012,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 173842, guid: 34576738923b14941a286d5fc7d3c9f6,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3803455971955113972}
+    - targetCorrespondingSourceObject: {fileID: 173842, guid: 34576738923b14941a286d5fc7d3c9f6,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6606124692002743087}
   m_SourcePrefab: {fileID: 100100000, guid: 34576738923b14941a286d5fc7d3c9f6, type: 3}
 --- !u!4 &1758636997865916554 stripped
 Transform:
@@ -5013,9 +5044,17 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1758636997866199470}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 0
-  serializedVersion: 2
+  serializedVersion: 3
   m_Size: {x: 0.16274834, y: 1.2048522, z: 0.21188991}
   m_Center: {x: 0.005101326, y: 0.4193789, z: 0.011326069}
 --- !u!114 &6606124692002743087
@@ -5030,7 +5069,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f7f2495c7757804c807e8e525b6dcb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: {x: 3, y: 7}
+  damage: {x: 7, y: 10}
   audioClips:
   - {fileID: 8300000, guid: 6cdf2b6afcdf03c4fb959f056819ba48, type: 3}
   volume: 0.25

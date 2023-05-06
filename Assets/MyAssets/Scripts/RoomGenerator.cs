@@ -10,7 +10,6 @@ public class RoomGenerator : MonoBehaviour
 {
     // Prefabs
     [SerializeField] private GameObject[] floorPrefabs;
-
     [SerializeField] private GameObject[] wallPrefabs;
     [SerializeField] private GameObject[] mushroomPrefabs;
     [SerializeField] private GameObject[] tablePrefabs;
@@ -20,10 +19,14 @@ public class RoomGenerator : MonoBehaviour
     [SerializeField] private GameObject doorPrefab;
     [SerializeField] private GameObject holePrefab;
     [SerializeField] private GameObject roofPrefab;
+
+    // Room Data
     [SerializeField] private TextMeshProUGUI roomTextNumber;
     public int roomNumber = 0;
     private Door.RoomType roomType = Door.RoomType.Basic;
     private int roomLevel = 1;
+
+    [SerializeField] private GameObject player;
     private GameObject[] doors;
     private GameObject entranceDoor;
 
@@ -39,15 +42,10 @@ public class RoomGenerator : MonoBehaviour
     // Navmesh
     [SerializeField] private NavMeshSurface surface;
 
-    [SerializeField] private GameObject player;
 
     private void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-    }
-
-    private void Update()
-    {
     }
 
     private void InstantiateFloorTiles(Vector3 position)
@@ -236,15 +234,19 @@ public class RoomGenerator : MonoBehaviour
 
     public void GenerateRoom(Door.RoomType _roomType, int _roomLevel, Vector3 _position)
     {
-        roomNumber++;
-        roomTextNumber.text = roomNumber.ToString();
-        player.gameObject.SetActive(false);
-        if (roomContent)
-            Destroy(roomContent);
+        // Reset NavMeshSurface
+        surface.RemoveData();
+
+        // Destroy previous room content then make new one
+        if (roomContent) Destroy(roomContent);
         roomContent = new GameObject("RoomContent");
         roomContent.transform.parent = GameObject.Find("DungeonManager").transform;
-
-        // Randomize width based on room level
+        // Disable player to avoid NavMesh issues
+        player.gameObject.SetActive(false);
+        // Update room number
+        roomNumber++;
+        roomTextNumber.text = roomNumber.ToString();
+        // Randomize room width based on room level
         int[] minSizes = { 3, 4, 6 };
         int[] maxSizes = { 4, 6, 10 };
         int minSize = minSizes[roomLevel - 1];
@@ -252,9 +254,11 @@ public class RoomGenerator : MonoBehaviour
         roomWidth = Random.Range(minSize, maxSize + 1);
         roomHeight = Random.Range(minSize, maxSize + 1);
 
+        // Create floors and walls
         InstantiateFloorTiles(_position);
         InstantiateWalls(_position);
-
+        // Build NavMesh
+        surface.BuildNavMesh();
         // Instantiate room content based on the selected room type
         roomLevel = _roomLevel;
         roomType = _roomType;
@@ -265,7 +269,6 @@ public class RoomGenerator : MonoBehaviour
         // Spawn enemies
         InstantiateEnemies(_position);
         player.gameObject.SetActive(true);
-
         // Move player to entrance of the room
         doors = GameObject.FindGameObjectsWithTag("Door");
         GameObject playerArmature = GameObject.Find("PlayerArmature");
@@ -276,6 +279,7 @@ public class RoomGenerator : MonoBehaviour
         playerArmature.transform.rotation = entranceDoor.transform.rotation;
         playerArmature.transform.position += playerArmature.transform.forward * 2.5f;
         cc.enabled = true;
+        // Temporary until "completing" rooms is implemented
         foreach (GameObject door in doors)
         {
             door.GetComponent<Door>().RoomCompleted();
@@ -410,10 +414,33 @@ public class RoomGenerator : MonoBehaviour
                     GameObject lootPrefab = lootPrefabs[Random.Range(0, lootPrefabs.Length)];
                     Quaternion lootRotation = Quaternion.Euler(-90f, Random.Range(0f, 360f), 0f);
                     lootPrefab.GetComponent<Rigidbody>().isKinematic = true;
-                    Instantiate(lootPrefab, lootPosition, lootRotation, table.transform);
+                    GameObject weapon = Instantiate(lootPrefab, lootPosition, lootRotation, table.transform);
+                    float damageFactor = RandomNormal(0.5f,1.5f) + (0.01f * roomNumber);
+                    weapon.GetComponent<Weapon>().damage *= damageFactor;
                 }
             }
         }
+    }
+    public static float RandomNormal(float minValue = 0.0f, float maxValue = 1.0f)
+    {
+        float u, v, S;
+
+        do
+        {
+            u = 2.0f * UnityEngine.Random.value - 1.0f;
+            v = 2.0f * UnityEngine.Random.value - 1.0f;
+            S = u * u + v * v;
+        }
+        while (S >= 1.0f);
+
+        // Standard Normal Distribution
+        float std = u * Mathf.Sqrt(-2.0f * Mathf.Log(S) / S);
+
+        // Normal Distribution centered between the min and max value
+        // and clamped following the "three-sigma rule"
+        float mean = (minValue + maxValue) / 2.0f;
+        float sigma = (maxValue - mean) / 3.0f;
+        return Mathf.Clamp(std * sigma + mean, minValue, maxValue);
     }
 
     private void InstantiateEnemies(Vector3 position)
