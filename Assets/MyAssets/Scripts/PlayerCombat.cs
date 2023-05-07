@@ -10,6 +10,7 @@ public class PlayerCombat : MonoBehaviour
         public int damage;
         public int speed;
         public int coins;
+        public int highscore;
     }
 
     public PlayerStats stats;

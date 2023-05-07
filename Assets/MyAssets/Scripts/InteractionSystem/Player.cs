@@ -12,11 +12,12 @@ public class Player : MonoBehaviour
     [SerializeField] private GameObject WeaponHolster;
     [SerializeField] private GameObject EquipedWeapon;
     [SerializeField] private InputActionReference interactionInput, dropInput, useInput;
-    [SerializeField] private int playerCoins = 0;
+    [SerializeField] private PlayerCombat playerCombat;
     private RaycastHit hit;
 
     private void Start()
     {
+        playerCombat = GetComponent<PlayerCombat>();
         interactionInput.action.performed += Interact;
         dropInput.action.performed += Drop;
         useInput.action.performed += Use;
@@ -76,12 +77,21 @@ public class Player : MonoBehaviour
                     door.OpenDoor();
                 }
             }
+            if (hit.collider.gameObject.tag == "Shopkeeper")
+            {
+                // Open shop
+                if (GameObject.Find("Shop").TryGetComponent(out ShopUI shop))
+                {
+                    shop.OpenShop();
+                }
+            }
+
         }
     }
 
     private void Update()
     {
-        coinsText.text = playerCoins.ToString();
+        coinsText.text = playerCombat.stats.coins.ToString();
         Debug.DrawRay(playerCameraTransform.position, playerCameraTransform.forward * pickUpDistance, Color.red);
         pickUpText.gameObject.SetActive(false);
         if (Physics.SphereCast(playerCameraTransform.position, 0.5f, playerCameraTransform.forward, out hit, pickUpDistance, pickableLayerMask))
@@ -91,7 +101,7 @@ public class Player : MonoBehaviour
             if (hit.collider.GetComponent<Weapon>() != null)
             {
                 pickUpText.transform.rotation = Quaternion.identity;
-                pickUpText.text = "Press E to Pick Up " + hit.collider.name + " (" + hit.collider.GetComponent<Weapon>().damage.x.ToString("0.00") + "-" + hit.collider.GetComponent<Weapon>().damage.y.ToString("0.00") + " dmg)";
+                pickUpText.text = "Press E to Pick Up <br>" + hit.collider.name + " (" + hit.collider.GetComponent<Weapon>().damage.x.ToString("0.00") + "-" + hit.collider.GetComponent<Weapon>().damage.y.ToString("0.00") + " dmg)";
             }
             else if (hit.collider.GetComponent(typeof(Door)) is Door door)
             {
@@ -107,6 +117,11 @@ public class Player : MonoBehaviour
                     else pickUpText.text = door.getRoomType(door.roomType1).ToString() + " " + door.room1Level;
                 }
             }
+            else if (hit.collider.gameObject.tag == "Shopkeeper")
+            {
+                pickUpText.transform.rotation = Quaternion.identity;
+                pickUpText.text = "Press E to Open Shop";
+            }
             else
             {
                 pickUpText.transform.rotation = Quaternion.identity;
@@ -117,20 +132,19 @@ public class Player : MonoBehaviour
 
     public void addCoins(int goldValue)
     {
-        playerCoins += goldValue;
-        GetComponent<PlayerCombat>().stats.coins = playerCoins;
+        playerCombat.stats.coins += goldValue;
     }
 
     public int getCoins()
     {
-        return playerCoins;
+        return playerCombat.stats.coins;
     }
 
     public bool removeCoins(int coinsToRemove)
     {
-        if (coinsToRemove <= playerCoins)
+        if (coinsToRemove <= playerCombat.stats.coins)
         {
-            playerCoins -= coinsToRemove;
+            playerCombat.stats.coins -= coinsToRemove;
             return true;
         }
         return false;

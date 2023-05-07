@@ -76,8 +76,12 @@ public class Health : MonoBehaviour
                 player.transform.rotation = Quaternion.identity;
                 cc.enabled = true;
             }
+            // Resrt player hp and room number
             SetHealth(maxHealth);
             GameObject.Find("DungeonManager").GetComponent<RoomGenerator>().roomNumber = 0;
+            // Destroy weapon if it exists, then reset the weapons in thee starting room
+            Destroy(player.GetComponentInChildren<Weapon>()?.gameObject);
+            GameObject.Find("StartingRoom").GetComponent<StartingRoomWeapons>().ResetWeapons();
         } // Otherwise destroy
         else Destroy(gameObject);
     }

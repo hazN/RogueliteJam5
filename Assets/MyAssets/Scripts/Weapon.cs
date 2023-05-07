@@ -30,6 +30,8 @@ public class Weapon : MonoBehaviour
         {
             // Deal Damage
             float finalDamage = Random.Range(damage.x, damage.y);
+            float damageStatModifier = 1.0f + (0.1f * (GameObject.Find("Player").GetComponentInChildren<PlayerCombat>().stats.damage - 1));
+            finalDamage *= damageStatModifier;
             other.GetComponent<Health>().TakeDamage(finalDamage);
             targetsHit.Add(other);
         }

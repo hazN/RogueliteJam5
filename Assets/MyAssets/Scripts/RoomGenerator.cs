@@ -246,6 +246,12 @@ public class RoomGenerator : MonoBehaviour
         // Update room number
         roomNumber++;
         roomTextNumber.text = roomNumber.ToString();
+        // Increase highscore if its higher than it
+        if (player.TryGetComponent<PlayerCombat>(out PlayerCombat playerCombat)) 
+        {
+            playerCombat.stats.highscore = roomNumber > playerCombat.stats.highscore ? roomNumber : playerCombat.stats.highscore;
+        }
+
         // Randomize room width based on room level
         int[] minSizes = { 3, 4, 6 };
         int[] maxSizes = { 4, 6, 10 };

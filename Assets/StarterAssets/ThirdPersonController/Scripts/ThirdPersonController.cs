@@ -269,6 +269,9 @@ namespace StarterAssets
 
             // check if the player is attacking and slow down velocity if true
             AnimatorStateInfo stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
+            int statValue = GetComponent<PlayerCombat>().stats.speed;
+            float speedModifier = 1 + (statValue - 1) * 0.001f;
+            _speed *= speedModifier;
             if (stateInfo.IsTag("Attack") && stateInfo.normalizedTime < 0.9)
             {
                 _speed = 1.6f;
