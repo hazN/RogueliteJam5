@@ -1,33 +1,45 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Animations;
 using UnityEngine;
-
+using System.IO;
 public class PlayerCombat : MonoBehaviour
 {
-    public List<AttackSO> combo;
-    float lastClickTime;
-    float lastComboEnd;
-    int comboIndex;
-
-    Animator anim;
-    [SerializeField] GameObject WeaponHolster;
-    Weapon weapon;
-    [SerializeField] AnimatorController defaultController;
-    void Start()
+    [System.Serializable]
+    public struct PlayerStats
     {
+        public int health;
+        public int damage;
+        public int speed;
+        public int coins;
+    }
+
+    public PlayerStats stats;
+
+    public List<AttackSO> combo;
+    private float lastClickTime;
+    private float lastComboEnd;
+    private int comboIndex;
+    private Animator anim;
+    [SerializeField] private GameObject WeaponHolster;
+    private Weapon weapon;
+    [SerializeField] private RuntimeAnimatorController defaultController;
+
+    private void Start()
+    {
+        LoadPlayerStats();
+        GetComponentInChildren<Health>().SetHealth(stats.health);
         anim = GetComponent<Animator>();
         // Get weapon script reference
         weapon = WeaponHolster.GetComponentInChildren<Weapon>();
-        if (weapon!= null)
+        if (weapon != null)
         {
             weapon.gameObject.tag = "CinemachineTarget";
             weapon.gameObject.layer = 8;
             combo = WeaponHolster.GetComponentInChildren<Weapon>().combo;
         }
+        InvokeRepeating("SavePlayerStats", 30.0f, 30.0f);
     }
 
-    void Update()
+    private void Update()
     {
         weapon = WeaponHolster.GetComponentInChildren<Weapon>();
         if (weapon == null)
@@ -38,7 +50,8 @@ public class PlayerCombat : MonoBehaviour
         }
         ExitAttack();
     }
-    void Attack()
+
+    private void Attack()
     {
         if (weapon == null) return;
         combo = WeaponHolster.GetComponentInChildren<Weapon>().combo;
@@ -60,17 +73,19 @@ public class PlayerCombat : MonoBehaviour
             }
         }
     }
-    void ExitAttack()
+
+    private void ExitAttack()
     {
         if (anim.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.9 && anim.GetCurrentAnimatorStateInfo(0).IsTag("Attack"))
         {
             Invoke("EndCombo", 1);
         }
     }
-    void EndCombo()
+
+    private void EndCombo()
     {
         comboIndex = 0;
-        lastComboEnd= Time.time;
+        lastComboEnd = Time.time;
     }
 
     private void OnAttack()
@@ -80,12 +95,40 @@ public class PlayerCombat : MonoBehaviour
             AudioSource.PlayClipAtPoint(weapon.audioClips[comboIndex], transform.position, weapon.volume);
         }
     }
+
     private void OnAttackStart()
     {
         weapon.EnableHitbox();
     }
+
     private void OnAttackEnd()
     {
         weapon.DisableHitbox();
+    }
+
+    public void SavePlayerStats()
+    {
+        string filePath = "/playerStats.json";
+        string json = JsonUtility.ToJson(stats);
+        File.WriteAllText(filePath, json);
+        Debug.Log(json);
+    }
+
+    public void LoadPlayerStats()
+    {
+        string filePath = "/playerStats.json";
+        if (File.Exists(filePath))
+        {
+            string json = File.ReadAllText(filePath);
+            stats = JsonUtility.FromJson<PlayerStats>(json);
+            GetComponent<Player>().addCoins(stats.coins);
+            Debug.Log(json);
+        }
+        if (stats.health < 100)
+            stats.health = 100;
+        if (stats.damage < 1)
+            stats.damage = 1;
+        if (stats.speed < 1)
+            stats.speed = 1;
     }
 }

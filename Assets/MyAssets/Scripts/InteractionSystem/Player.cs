@@ -118,6 +118,7 @@ public class Player : MonoBehaviour
     public void addCoins(int goldValue)
     {
         playerCoins += goldValue;
+        GetComponent<PlayerCombat>().stats.coins = playerCoins;
     }
 
     public int getCoins()

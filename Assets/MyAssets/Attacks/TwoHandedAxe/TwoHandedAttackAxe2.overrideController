@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: TwoHandedAttackAxe2
+  m_Controller: {fileID: 9100000, guid: 40db3173a05ae3242b1c182a09b0a183, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 6564411413370888346, guid: 16114d403eabb53438de032c6f0d1deb,
+      type: 3}
+    m_OverrideClip: {fileID: 7400000, guid: 525f86aace5b37d4cb9ad1db9ae88542, type: 3}
+  - m_OriginalClip: {fileID: 7400016, guid: df74f516f8958a24bab217e3603c71cd, type: 3}
+    m_OverrideClip: {fileID: 7400016, guid: 743906c385160ed4bb6d8f89255c0028, type: 3}
+  - m_OriginalClip: {fileID: 7400000, guid: b02430a054524da49b8a1b7470eb4b58, type: 3}
+    m_OverrideClip: {fileID: 7400000, guid: 2819c2ca5c39d6a479e784e3435b6b2c, type: 3}
+  - m_OriginalClip: {fileID: 7400000, guid: f8c2d6a0ce3bc2d40b090cd67dd23862, type: 3}
+    m_OverrideClip: {fileID: 7400000, guid: 013ae146cf4e48b458933dc8e788350c, type: 3}
+  - m_OriginalClip: {fileID: 7400000, guid: f1613afb92638e743bace9a9392b5ee7, type: 3}
+    m_OverrideClip: {fileID: 7400000, guid: 099948ddac652df46a0502e24c8ac9aa, type: 3}

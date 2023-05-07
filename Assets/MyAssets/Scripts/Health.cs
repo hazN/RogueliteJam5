@@ -18,6 +18,14 @@ public class Health : MonoBehaviour
         currentHealth = maxHealth;
         anim = GetComponent<Animator>();
     }
+    public void SetHealth(float health)
+    {
+        maxHealth = health;
+        if (maxHealth < 100) maxHealth = 100;
+        currentHealth = health;
+        if (healthBar)
+            healthBar.value = currentHealth / maxHealth;
+    }
     public bool Heal(float hp)
     {
         // Return false if already max hp
@@ -54,6 +62,23 @@ public class Health : MonoBehaviour
     }
     void Die()
     {
-        Destroy(gameObject);
+        // Check if its a player 
+        if (TryGetComponent(out Player player))
+        {
+            // Check if player has combat component so we can save the stats
+            if (TryGetComponent(out PlayerCombat playerCombat))
+                playerCombat.SavePlayerStats();
+            // Reset player position
+            if (TryGetComponent(out CharacterController cc))
+            {
+                cc.enabled = false;
+                player.transform.position = new Vector3(4.9f, 2.37f, -48f);
+                player.transform.rotation = Quaternion.identity;
+                cc.enabled = true;
+            }
+            SetHealth(maxHealth);
+            GameObject.Find("DungeonManager").GetComponent<RoomGenerator>().roomNumber = 0;
+        } // Otherwise destroy
+        else Destroy(gameObject);
     }
 }

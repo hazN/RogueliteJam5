@@ -303,7 +303,7 @@ public class RoomGenerator : MonoBehaviour
 
             case Door.RoomType.Health:
                 // More mushrooms, less coins and loot
-                mushroomCount = Mathf.RoundToInt(mushroomCount * 2.5f);
+                mushroomCount = Mathf.RoundToInt(mushroomCount * 3.5f);
                 coinCount = Mathf.RoundToInt(coinCount * 0.5f);
                 tableCount = Mathf.RoundToInt(tableCount * 0.8f);
                 break;
@@ -311,7 +311,7 @@ public class RoomGenerator : MonoBehaviour
             case Door.RoomType.Gold:
                 // More coins, less mushrooms and loot
                 mushroomCount = Mathf.RoundToInt(mushroomCount * 0.5f);
-                coinCount = Mathf.RoundToInt(coinCount * 2.5f);
+                coinCount = Mathf.RoundToInt(coinCount * 3.5f);
                 tableCount = Mathf.RoundToInt(tableCount * 0.8f);
                 break;
 
@@ -319,7 +319,7 @@ public class RoomGenerator : MonoBehaviour
                 // More loot, less mushrooms and coins
                 mushroomCount = Mathf.RoundToInt(mushroomCount * 0.8f);
                 coinCount = Mathf.RoundToInt(coinCount * 0.8f);
-                tableCount = Mathf.RoundToInt(tableCount * 2.5f);
+                tableCount = Mathf.RoundToInt(tableCount * 3.5f);
                 break;
         }
 
@@ -415,6 +415,7 @@ public class RoomGenerator : MonoBehaviour
                     Quaternion lootRotation = Quaternion.Euler(-90f, Random.Range(0f, 360f), 0f);
                     lootPrefab.GetComponent<Rigidbody>().isKinematic = true;
                     GameObject weapon = Instantiate(lootPrefab, lootPosition, lootRotation, table.transform);
+                    weapon.name = lootPrefab.name;
                     float damageFactor = RandomNormal(0.5f,1.5f) + (0.01f * roomNumber);
                     weapon.GetComponent<Weapon>().damage *= damageFactor;
                 }
