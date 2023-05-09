@@ -98,6 +98,7 @@ public class Player : MonoBehaviour
         {
             pickUpText.gameObject.SetActive(true);
             pickUpText.transform.position = Camera.main.WorldToScreenPoint(hit.collider.transform.position + Vector3.up * 1.1f);
+            pickUpText.transform.rotation = Quaternion.identity;
             if (hit.collider.GetComponent<Weapon>() != null)
             {
                 pickUpText.transform.rotation = Quaternion.identity;
@@ -107,24 +108,15 @@ public class Player : MonoBehaviour
             {
                 if (door.isActive)
                 {
-                    // rotate text on y axis
-                    pickUpText.transform.rotation *= Quaternion.Euler(0f, 0.3f, 0f);
-                    // change text based on rotation
-                    if (pickUpText.transform.rotation.eulerAngles.y >= 180f)
-                    {
-                        pickUpText.text = door.getRoomType(door.roomType2).ToString() + " " + door.room2Level;
-                    }
-                    else pickUpText.text = door.getRoomType(door.roomType1).ToString() + " " + door.room1Level;
+                    pickUpText.text = "Press E to Enter Door";
                 }
             }
             else if (hit.collider.gameObject.tag == "Shopkeeper")
             {
-                pickUpText.transform.rotation = Quaternion.identity;
                 pickUpText.text = "Press E to Open Shop";
             }
             else
             {
-                pickUpText.transform.rotation = Quaternion.identity;
                 pickUpText.text = "Press E to Eat ";
             }
         }

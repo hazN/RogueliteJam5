@@ -9,6 +9,7 @@ TagManager:
   - Enemy
   - Door
   - RoomText
+  - Shopkeeper
   layers:
   - Default
   - TransparentFX

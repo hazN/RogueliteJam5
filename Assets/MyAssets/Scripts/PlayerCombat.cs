@@ -122,7 +122,6 @@ public class PlayerCombat : MonoBehaviour
         {
             string json = File.ReadAllText(filePath);
             stats = JsonUtility.FromJson<PlayerStats>(json);
-            GetComponent<Player>().addCoins(stats.coins);
             Debug.Log(json);
         }
         if (stats.health < 100)
