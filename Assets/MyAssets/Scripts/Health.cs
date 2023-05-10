@@ -83,6 +83,12 @@ public class Health : MonoBehaviour
             Destroy(player.GetComponentInChildren<Weapon>()?.gameObject);
             GameObject.Find("StartingRoom").GetComponent<StartingRoomWeapons>().ResetWeapons();
         } // Otherwise destroy
+        else if (gameObject.layer == 9)
+        {
+            GameObject.Find("DungeonManager").GetComponent<RoomGenerator>().EnemyKilled();
+            GetComponent<RagdollEnabler>().EnableRagdoll();
+            GetComponentInChildren<Weapon>().enabled = false;
+        }
         else Destroy(gameObject);
     }
 }

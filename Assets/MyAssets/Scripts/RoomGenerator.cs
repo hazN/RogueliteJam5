@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using Unity.AI.Navigation;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -27,7 +28,7 @@ public class RoomGenerator : MonoBehaviour
     public int roomNumber = 0;
     private Door.RoomType roomType = Door.RoomType.Basic;
     private int roomLevel = 1;
-
+    private int enemiesAlive = 0;
     [SerializeField] private GameObject player;
     private GameObject[] doors;
     private GameObject entranceDoor;
@@ -49,7 +50,23 @@ public class RoomGenerator : MonoBehaviour
     {
         player = GameObject.FindGameObjectWithTag("Player");
     }
-
+    private void Update()
+    {
+        // Check if all enemies are dead
+        if (enemiesAlive <= 0 && doors != null)
+        {
+            foreach (GameObject door in doors)
+            {
+                if (door != null)
+                    door.GetComponent<Door>().RoomCompleted();
+            }
+            enemiesAlive = 100;
+        }
+    }
+    public void EnemyKilled()
+    {
+        enemiesAlive--;
+    }
     private void InstantiateFloorTiles(Vector3 position)
     {
         List<Vector2Int> holePositions = new List<Vector2Int>();
@@ -186,7 +203,6 @@ public class RoomGenerator : MonoBehaviour
                         {
                             prefabToInstantiate = doorPrefab;
                             prefabToInstantiate.transform.position += transform.right * 2.5f;
-                            prefabToInstantiate.GetComponent<Door>().isActive = true;
                             prefabToInstantiate.layer = 11;
                             doorPlaced = true;
                         }
@@ -288,11 +304,6 @@ public class RoomGenerator : MonoBehaviour
         playerArmature.transform.rotation = entranceDoor.transform.rotation;
         playerArmature.transform.position += playerArmature.transform.forward * 2.5f;
         cc.enabled = true;
-        // Temporary until "completing" rooms is implemented
-        foreach (GameObject door in doors)
-        {
-            door.GetComponent<Door>().RoomCompleted();
-        }
     }
 
     private void InstantiateRoomContent(Vector3 position, Door.RoomType roomType, int roomLevel)
@@ -300,7 +311,7 @@ public class RoomGenerator : MonoBehaviour
         // Generate navmesh to use to find valid points to place stuff
         //surface.BuildNavMesh();
 
-        int mushroomCount = Random.Range(roomWidth + roomHeight, roomWidth * roomHeight);
+        int mushroomCount = Mathf.CeilToInt(Random.Range(roomWidth + roomHeight, roomWidth * roomHeight) * 1.5f);
         int coinCount = Random.Range(roomWidth + roomHeight, roomWidth * roomHeight);
         int tableCount = Random.Range(roomWidth + roomHeight, roomWidth * roomHeight) / 2;
 
@@ -455,10 +466,12 @@ public class RoomGenerator : MonoBehaviour
 
     private void InstantiateEnemies(Vector3 position)
     {
+        enemiesAlive = 0;
         switch (roomType)
         {
             case Door.RoomType.Boss:
                 {
+                    enemiesAlive = 1;
                     // Get a random position within the room bounds
                     Vector3 bossPosition = position + new Vector3(Random.Range(-roomWidth / 2.1f, roomWidth / 2.1f) * 10f,
                                 0f,
@@ -492,9 +505,9 @@ public class RoomGenerator : MonoBehaviour
                 }
             default:
                 {
-                    int enemyCount = 0;
                     // Default amount of enemies
-                    enemyCount = Random.Range(roomWidth + roomHeight, roomWidth * roomHeight);
+                    int enemiesToSpawn = 0;
+                    enemiesToSpawn = Random.Range(roomWidth + roomHeight, roomWidth * roomHeight);
                     // Probability to spawn each enemy type
                     float level1Prob = 0.7f - (0.05f * roomNumber);
                     float level2Prob = 0.25f + (0.025f * roomNumber);
@@ -507,7 +520,7 @@ public class RoomGenerator : MonoBehaviour
                     level3Prob /= sum;
 
                     // Instantiate the enemies
-                    for (int i = 0; i < enemyCount; i++)
+                    for (int i = 0; i < enemiesToSpawn; i++)
                     {
                         // Generate a random position within the room bounds
                         Vector3 enemyPosition = position + new Vector3(Random.Range(-roomWidth / 2.1f, roomWidth / 2.1f) * 10f,
@@ -538,6 +551,7 @@ public class RoomGenerator : MonoBehaviour
                             // Increase damage based on level too
                             float damageFactor = 1.0f + (0.01f * roomNumber);
                             enemy.GetComponentInChildren<Weapon>().damage *= damageFactor;
+                            enemiesAlive++;
                         }
                     }
                     break;

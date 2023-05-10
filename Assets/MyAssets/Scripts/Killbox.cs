@@ -9,7 +9,7 @@ public class Killbox : MonoBehaviour
         bool isPlayer = other.transform.root.CompareTag("Player");
         if (isPlayer)
         {
-            other.GetComponent<Health>().TakeDamage(999999999999f);
+            other.GetComponentInChildren<Health>().TakeDamage(999999999999f);
         }
         else Destroy(other);
     }

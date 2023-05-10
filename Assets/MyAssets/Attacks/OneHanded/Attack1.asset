@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: Attack1
   m_EditorClassIdentifier: 
   animatorOV: {fileID: 22100000, guid: e564636663ac84d4aae292b82cbdeb91, type: 2}
+  SwingSpeed: 1.5

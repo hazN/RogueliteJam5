@@ -28,12 +28,6 @@ public class Door : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        if (!isActive)
-            return;
-    }
-
     public void RoomCompleted()
     {
         isActive = true;

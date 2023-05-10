@@ -85,7 +85,11 @@ public class Player : MonoBehaviour
                     shop.OpenShop();
                 }
             }
-
+            if (hit.collider.gameObject.tag == "QuitTotem")
+            {
+                gameObject.transform.root.GetComponentInChildren<PlayerCombat>().SavePlayerStats();
+                Application.Quit();
+            }
         }
     }
 
@@ -114,6 +118,10 @@ public class Player : MonoBehaviour
             else if (hit.collider.gameObject.tag == "Shopkeeper")
             {
                 pickUpText.text = "Press E to Open Shop";
+            }
+            else if (hit.collider.gameObject.tag == "QuitTotem")
+            {
+                pickUpText.text = "Press E to Save and Quit";
             }
             else
             {

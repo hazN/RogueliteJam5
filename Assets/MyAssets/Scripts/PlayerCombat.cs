@@ -17,7 +17,6 @@ public class PlayerCombat : MonoBehaviour
 
     public List<AttackSO> combo;
     private float lastClickTime;
-    private float lastComboEnd;
     private int comboIndex;
     private Animator anim;
     [SerializeField] private GameObject WeaponHolster;
@@ -58,7 +57,7 @@ public class PlayerCombat : MonoBehaviour
         combo = WeaponHolster.GetComponentInChildren<Weapon>().combo;
         weapon.gameObject.tag = "CinemachineTarget";
         weapon.gameObject.layer = 8;
-        if (Time.time - lastClickTime > 0.5f && comboIndex < combo.Count)
+        if (Time.time - lastClickTime > 0.5f / combo[comboIndex].getSwingSpeed() && comboIndex < combo.Count)
         {
             CancelInvoke("EndCombo");
             float animationLength = anim.runtimeAnimatorController.animationClips[0].length;
@@ -66,6 +65,8 @@ public class PlayerCombat : MonoBehaviour
             if (Time.time - lastClickTime >= animationLength * 0.5f)
             {
                 anim.runtimeAnimatorController = combo[comboIndex].animatorOV;
+                // Get the swingSpeed from the animator and add it
+                anim.SetFloat("swingSpeed", combo[comboIndex].getSwingSpeed());
                 anim.Play("Attack", 0, 0);
                 comboIndex++;
                 lastClickTime = Time.time;
@@ -86,7 +87,6 @@ public class PlayerCombat : MonoBehaviour
     private void EndCombo()
     {
         comboIndex = 0;
-        lastComboEnd = Time.time;
     }
 
     private void OnAttack()
@@ -109,7 +109,7 @@ public class PlayerCombat : MonoBehaviour
 
     public void SavePlayerStats()
     {
-        string filePath = "/playerStats.json";
+        string filePath = Application.persistentDataPath + "/playerStats.json";
         string json = JsonUtility.ToJson(stats);
         File.WriteAllText(filePath, json);
         Debug.Log(json);
@@ -117,7 +117,7 @@ public class PlayerCombat : MonoBehaviour
 
     public void LoadPlayerStats()
     {
-        string filePath = "/playerStats.json";
+        string filePath = Application.persistentDataPath + "/playerStats.json";
         if (File.Exists(filePath))
         {
             string json = File.ReadAllText(filePath);
