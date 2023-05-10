@@ -1,4 +1,5 @@
 # Roguelite Jam 5
+### https://hazndev.itch.io/luck-of-the-coin  
 April 25th 2023 - May 9th 2023 (2 Weeks)
 ## Luck of the Coin
 Luck of the Coin is a roguelite game I created in just two weeks for Roguelike Jam 5. The theme was "Two Sides of the Same Coin," and I wanted to do something unique that built upon the core roguelite gameloop.
@@ -14,3 +15,5 @@ Feel free to download and open the source code in Unity, or check out the script
 **Combat System:** This was my first time implementing an actual combat system in Unity. I used scriptable objects for each attack, allowing me to easily add new attacks and give them their own animator overrider. I modified the starter 3rd person controller to make the player slow down and move forward with their attacks, making combat feel more refined. Different weapon types, like the sword, axe, and hammer, were also implemented. 
 
 I've added a lot more that is probably not worth mentioning but I encourage you to check the code if you are interested, for example I made an interaction system to open doors, eat mushrooms, talk to the shopkeeper, etc.
+
+![RGJimg1](https://github.com/hazN/RogueliteJam5/assets/40077821/8ac6f1ea-a87a-40a9-b405-19c4950fe091)
